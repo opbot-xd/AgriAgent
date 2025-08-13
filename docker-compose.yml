@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: agriagent-postgres
+    environment:
+      POSTGRES_DB: agriagent
+      POSTGRES_USER: agriuser
+      POSTGRES_PASSWORD: agripass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - agriagent-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: agriagent-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - agriagent-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agriagent-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://agriuser:agripass123@postgres:5432/agriagent
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=your-secret-key-change-in-production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - model_cache:/app/models
+    networks:
+      - agriagent-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agriagent-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - agriagent-network
+    restart: unless-stopped
+
+  # ChromaDB Vector Database (Optional - for RAG)
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: agriagent-chroma
+    ports:
+      - "8100:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+    networks:
+      - agriagent-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  chroma_data:
+    driver: local
+  model_cache:
+    driver: local
+
+networks:
+  agriagent-network:
+    driver: bridge
