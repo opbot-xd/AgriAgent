@@ -136,21 +136,24 @@ INSERT INTO knowledge_base (category, title, content, keywords, language, source
 ('soil', 'Soil pH Management', 'Most crops prefer slightly acidic to neutral soil pH (6.0-7.0). Regular soil testing and appropriate amendments are necessary for optimal growth.', ARRAY['soil', 'pH', 'acid', 'neutral', 'testing'], 'en', 'Soil Science Manual');
 
 -- Create views for common queries
-CREATE VIEW IF NOT EXISTS user_activity AS
+-- Drop old views if they exist
+DROP VIEW IF EXISTS user_activity;
+CREATE VIEW user_activity AS
 SELECT 
     u.username,
     u.language_preference,
-    COUNT(q.id) as total_queries,
-    COUNT(CASE WHEN q.query_type = 'chat' THEN 1 END) as chat_queries,
-    COUNT(CASE WHEN q.query_type = 'image' THEN 1 END) as image_queries,
-    COUNT(CASE WHEN q.query_type = 'voice' THEN 1 END) as voice_queries,
-    AVG(q.confidence_score) as avg_confidence,
-    u.created_at as user_since
+    COUNT(q.id) AS total_queries,
+    COUNT(CASE WHEN q.query_type = 'chat' THEN 1 END) AS chat_queries,
+    COUNT(CASE WHEN q.query_type = 'image' THEN 1 END) AS image_queries,
+    COUNT(CASE WHEN q.query_type = 'voice' THEN 1 END) AS voice_queries,
+    AVG(q.confidence_score) AS avg_confidence,
+    u.created_at AS user_since
 FROM users u
 LEFT JOIN queries q ON u.id = q.user_id
 GROUP BY u.id, u.username, u.language_preference, u.created_at;
 
-CREATE VIEW IF NOT EXISTS recent_queries AS
+DROP VIEW IF EXISTS recent_queries;
+CREATE VIEW recent_queries AS
 SELECT 
     u.username,
     q.query_type,
@@ -161,3 +164,29 @@ FROM queries q
 JOIN users u ON q.user_id = u.id
 ORDER BY q.created_at DESC
 LIMIT 100;
+
+-- CREATE VIEW IF NOT EXISTS user_activity AS
+-- SELECT 
+--     u.username,
+--     u.language_preference,
+--     COUNT(q.id) as total_queries,
+--     COUNT(CASE WHEN q.query_type = 'chat' THEN 1 END) as chat_queries,
+--     COUNT(CASE WHEN q.query_type = 'image' THEN 1 END) as image_queries,
+--     COUNT(CASE WHEN q.query_type = 'voice' THEN 1 END) as voice_queries,
+--     AVG(q.confidence_score) as avg_confidence,
+--     u.created_at as user_since
+-- FROM users u
+-- LEFT JOIN queries q ON u.id = q.user_id
+-- GROUP BY u.id, u.username, u.language_preference, u.created_at;
+
+-- CREATE VIEW IF NOT EXISTS recent_queries AS
+-- SELECT 
+--     u.username,
+--     q.query_type,
+--     q.original_query,
+--     q.confidence_score,
+--     q.created_at
+-- FROM queries q
+-- JOIN users u ON q.user_id = u.id
+-- ORDER BY q.created_at DESC
+-- LIMIT 100;

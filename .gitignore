@@ -1,2 +1,4 @@
 .env
-.env.example
+venv
+node_modules
+frontend/node_modules
