@@ -12,7 +12,13 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Camera, Upload, RotateCcw, CheckCircle, MapPin, ThermometerSun } from "lucide-react"
 import ResultDisplay from "./ResultDisplay"
-const ImageInterface = () => {
+import { getApiUrl } from '@/lib/utils';
+
+// Add props interface
+interface ImageInterfaceProps {}
+
+// Update component to accept props
+const ImageInterface: React.FC<ImageInterfaceProps> = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [language, setLanguage] = useState("en")
   const [preview, setPreview] = useState<string | null>(null)
@@ -63,7 +69,7 @@ const ImageInterface = () => {
     formData.append("date", date)
 
     try {
-      const response = await axios.post("http://localhost:8000/upload", formData, {
+      const response = await axios.post(getApiUrl("/upload"), formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       setResult(response.data)

@@ -1,22 +1,16 @@
-import React, { useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import {
-  AlertCircle,
-  Bot,
-  CheckCircle,
-  CloudRain,
-  Sun,
-  Droplets, 
-  Wind,
-  DollarSign,
-  TrendingUp,
-  BookOpen,
-  Play
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import {Button} from "@/components/ui/button"
+"use client"
 
-const ResultDisplay = ({ result }: { result: any }) => {
+import React, { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { AlertCircle, Bot, CheckCircle, CloudRain, Sun, Droplets, Wind, DollarSign, TrendingUp, BookOpen, Play } from "lucide-react"
+
+interface ResultDisplayProps {
+  result: any
+}
+
+const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
   const [playingAudio, setPlayingAudio] = useState(false)
 
   const playAudio = () => {
@@ -44,7 +38,6 @@ const ResultDisplay = ({ result }: { result: any }) => {
 
   return (
     <div className="mt-8 space-y-6">
-      {/* AI Response Card */}
       <Card className="border-0 leaf-shadow bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -76,7 +69,6 @@ const ResultDisplay = ({ result }: { result: any }) => {
             )}
           </div>
         </CardHeader>
-
         <CardContent className="space-y-6">
           {result.query && (
             <div>
@@ -84,12 +76,10 @@ const ResultDisplay = ({ result }: { result: any }) => {
               <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">{result.query}</p>
             </div>
           )}
-
           <div>
             <h4 className="font-serif font-bold text-gray-700 mb-2">AI Response:</h4>
             <p className="text-gray-800 leading-relaxed text-lg">{result.response}</p>
           </div>
-
           {result.recommendations && result.recommendations.length > 0 && (
             <div>
               <h4 className="font-serif font-bold text-gray-700 mb-3">Recommendations:</h4>
@@ -108,8 +98,6 @@ const ResultDisplay = ({ result }: { result: any }) => {
           )}
         </CardContent>
       </Card>
-
-      {/* Weather & Market */}
       <div className="grid md:grid-cols-2 gap-6">
         {result.weather_data && (
           <Card className="border-blue-200 bg-blue-50">
@@ -123,25 +111,32 @@ const ResultDisplay = ({ result }: { result: any }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Sun className="w-4 h-4 text-orange-500" />
-                  <span className="text-sm"><span className="font-medium">Temperature:</span> {result.weather_data.temperature}°C</span>
+                  <span className="text-sm">
+                    <span className="font-medium">Temperature:</span> {result.weather_data.temperature}°C
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Droplets className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm"><span className="font-medium">Humidity:</span> {result.weather_data.humidity}%</span>
+                  <span className="text-sm">
+                    <span className="font-medium">Humidity:</span> {result.weather_data.humidity}%
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CloudRain className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm"><span className="font-medium">Condition:</span> {result.weather_data.description}</span>
+                  <span className="text-sm">
+                    <span className="font-medium">Condition:</span> {result.weather_data.description}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Wind className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm"><span className="font-medium">Wind:</span> {result.weather_data.wind_speed ?? "N/A"} m/s</span>
+                  <span className="text-sm">
+                    <span className="font-medium">Wind:</span> {result.weather_data.wind_speed} m/s
+                  </span>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
-
         {result.market_data && (
           <Card className="border-green-200 bg-green-50">
             <CardHeader>
@@ -151,24 +146,33 @@ const ResultDisplay = ({ result }: { result: any }) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm"><span className="font-medium">Crop:</span> {result.market_data.crop}</p>
-              <p className="text-sm"><span className="font-medium">Price:</span> ₹{result.market_data.price_per_quintal}/quintal</p>
-              <p className="text-sm"><span className="font-medium">Market:</span> {result.market_data.market}</p>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-sm"><span className="font-medium">Trend:</span> {result.market_data.trend}</span>
+              <div className="space-y-2">
+                <p className="text-sm">
+                  <span className="font-medium">Crop:</span> {result.market_data.crop}
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Price:</span> ₹{result.market_data.price_per_quintal}/quintal
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Market:</span> {result.market_data.market}
+                </p>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-sm">
+                    <span className="font-medium">Trend:</span> {result.market_data.trend}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
         )}
       </div>
-
-      {/* Sources */}
       {result.sources && result.sources.length > 0 && (
         <Card className="border-gray-200 bg-gray-50">
           <CardContent className="p-4">
             <h4 className="font-serif font-bold text-gray-700 mb-2 flex items-center gap-2">
-              <BookOpen className="w-4 h-4" /> Sources
+              <BookOpen className="w-4 h-4" />
+              Sources
             </h4>
             <ul className="text-sm text-gray-600 space-y-1">
               {result.sources.map((source: string, index: number) => (
@@ -185,4 +189,4 @@ const ResultDisplay = ({ result }: { result: any }) => {
   )
 }
 
-export default ResultDisplay
+export default ResultDisplay;
