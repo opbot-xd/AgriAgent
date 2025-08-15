@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from typing import Dict, List
-from ..schemas.chat import ChatRequest
-from ..services.chat_service import ChatService
+from schemas.chat import ChatRequest
+from services.chat_service import ChatService
 import logging
 
 router = APIRouter()
