@@ -31,11 +31,7 @@ async def chat_endpoint(chat_request: ChatRequest):
         if "error" in response:
             raise HTTPException(status_code=400, detail=response["error"])
             
-        return JSONResponse(content={
-            "response": response["response"],
-            "language": response["language"],
-            "sources": response.get("sources", {})
-        })
+        return JSONResponse(content=response)
         
     except Exception as e:
         logging.error(f"Error in chat endpoint: {str(e)}")
