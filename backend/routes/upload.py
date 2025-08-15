@@ -61,7 +61,7 @@ async def get_weather(coords: str):
     lat_str, lon_str = coords.split(",")
     lat = float(lat_str.strip())
     lon = float(lon_str.strip())
-    url = f"https://api.openweathermap.org/data/3.0/weather?lat={lat}&lon={lon}&appid={WEATHER_API_KEY}&units=metric"
+    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={WEATHER_API_KEY}&units=metric"
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.get(url)
         if resp.status_code != 200:
