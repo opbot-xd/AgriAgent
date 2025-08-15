@@ -174,7 +174,7 @@ class ChatService:
                 logger.error("WEATHER_API_KEY not set in environment.")
                 return {"error": "Weather API key not configured."}
             import httpx
-            url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lng}&appid={WEATHER_API_KEY}&units=metric"
+            url = f"https://api.openweathermap.org/data/3.0/weather?lat={lat}&lon={lng}&appid={WEATHER_API_KEY}&units=metric"
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(url)
                 if resp.status_code != 200:

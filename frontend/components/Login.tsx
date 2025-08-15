@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true)
     setError("")
     try {
-      const endpoint = isLogin ? "/auth/login" : "/auth/register"
+      const endpoint = isLogin ? "/auth/login" : "/auth/signup"
       const response = await axios.post(getApiUrl(endpoint), formData)
       localStorage.setItem("token", response.data.access_token)
       localStorage.setItem("username", formData.username)
