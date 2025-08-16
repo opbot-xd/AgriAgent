@@ -6,7 +6,12 @@ from routes.forecast import router as forecast_router
 from database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import os
+from dotenv import load_dotenv
 from services import forecast_service
+
+# Load environment variables
+load_dotenv()
 
 # Global variable to store locations (loaded once at startup)
 LOCATIONS_CACHE = None
@@ -71,7 +76,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # your Next.js frontend
+    allow_origins=os.getenv("FRONTEND_URL", "http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
