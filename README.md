@@ -11,6 +11,7 @@ A comprehensive AI-powered agricultural advisory system that provides farmers wi
 - **Market Insights**: Current market prices and trends
 - **AI-Powered Responses**: Advanced machine learning models for accurate recommendations
 - **Text-to-Speech**: Audio responses in the user's preferred language
+- **Price Prediction** : Predict future crop prices using trained ML models.
 
 ## 🚀 Quick Start with Docker
 
@@ -23,7 +24,7 @@ A comprehensive AI-powered agricultural advisory system that provides farmers wi
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/opbot-xd/AgriAgent.git
 cd agriagent
 ```
 
@@ -32,22 +33,35 @@ cd agriagent
 Create a `.env` file in the root directory:
 
 ```env
-# API Keys
-OPENAI_API_KEY=your_openai_api_key_here
-WEATHER_API_KEY=your_openweather_api_key_here
-
-# Database Configuration
-POSTGRES_DB=agriagent
-POSTGRES_USER=agriuser
-POSTGRES_PASSWORD=agripass123
+# Database
+DATABASE_URL=sqlite+aiosqlite:///./agriagent.db
 
 # Security
-SECRET_KEY=your-very-secret-key-change-this-in-production
+SECRET_KEY=your_super_secret_key
 
-# Optional: AWS S3 for file storage
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_BUCKET_NAME=your_bucket_name
+# Token
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+
+# Google Gemini/Generative AI
+GOOGLE_API_KEY=your_google_api_key
+GEMINI_API_KEY=your_gemini_api_key
+
+# Dhenu AI
+DHENU_API_KEY=your_dhenu_api_key
+
+# Weather API
+WEATHER_API_KEY=your_weather_api_key
+
+# CORS
+FRONTEND_URL=http://localhost:3000
+
+#huggingface
+HF_TOKEN=your_huggingface_token
+HF_API_URL=https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_10_224-plant-disease-identification
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
 ```
 
 ### 3. Start the Application
@@ -65,7 +79,6 @@ docker-compose up -d --build
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
-- **ChromaDB**: http://localhost:8100
 
 ## 🛠️ Manual Setup (Development)
 
@@ -85,38 +98,38 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. **Setup PostgreSQL**
-
-```sql
--- Connect to PostgreSQL as superuser
-CREATE DATABASE agriagent;
-CREATE USER agriuser WITH PASSWORD 'agripass123';
-GRANT ALL PRIVILEGES ON DATABASE agriagent TO agriuser;
-
--- Connect to agriagent database and run schema
-\c agriagent;
-\i schema.sql
-```
-
-4. **Setup Redis**
+5. **Create a .env file**
 
 ```bash
-# Install Redis (Ubuntu/Debian)
-sudo apt-get install redis-server
-sudo systemctl start redis-server
+# Database
+DATABASE_URL=sqlite+aiosqlite:///./agriagent.db
 
-# Or using Docker
-docker run -d -p 6379:6379 redis:alpine
-```
+# Security
+SECRET_KEY=your_super_secret_key
 
-5. **Configure Environment**
+# Token
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-```bash
-export DATABASE_URL="postgresql://agriuser:agripass123@localhost:5432/agriagent"
-export REDIS_URL="redis://localhost:6379"
-export SECRET_KEY="your-secret-key"
-export OPENAI_API_KEY="your-openai-key"
-export WEATHER_API_KEY="your-weather-key"
+# Google Gemini/Generative AI
+GOOGLE_API_KEY=your_google_api_key
+GEMINI_API_KEY=your_gemini_api_key
+
+# Dhenu AI
+DHENU_API_KEY=your_dhenu_api_key
+
+# Weather API
+WEATHER_API_KEY=your_weather_api_key
+
+# CORS
+FRONTEND_URL=http://localhost:3000
+
+#huggingface
+HF_TOKEN=your_huggingface_token
+HF_API_URL=https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
 ```
 
 6. **Start Backend Server**
@@ -134,14 +147,7 @@ cd frontend
 npm install
 ```
 
-2. **Install Tailwind CSS**
-
-```bash
-npm install -D tailwindcss postcss autoprefixer @tailwindcss/forms @tailwindcss/typography
-npx tailwindcss init -p
-```
-
-3. **Configure Environment**
+2. **Configure Environment**
 
 Create `.env` in frontend directory:
 
@@ -158,63 +164,132 @@ npm start
 ## 📁 Project Structure
 
 ```
-agriagent/
-├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── schema.sql           # Database schema
-│   ├── requirements.txt     # Python dependencies
-│   ├── Dockerfile          # Backend Docker configuration
-│   └── models/             # AI model storage
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx         # Main React component
-│   │   ├── App.css         # Tailwind CSS styles
-│   │   └── index.js        # React entry point
-│   ├── public/             # Static assets
-│   ├── package.json        # Node.js dependencies
-│   ├── tailwind.config.js  # Tailwind configuration
-│   └── Dockerfile          # Frontend Docker configuration
-├── docker-compose.yml       # Docker services configuration
-├── .env                    # Environment variables
-└── README.md              # This file
+AgriAgent/
+├── backend/ # FastAPI backend
+│ ├── dataset/ # Training / data files
+│ ├── models/ # AI/ML models
+│ ├── routes/ # API route definitions
+│ ├── schemas/ # Pydantic schemas
+│ ├── services/ # Business logic and services
+│ ├── utils/ # Utility/helper functions
+│ ├── venv/ # Python virtual environment (local only, not in Docker)
+│ ├── agriagent.db # SQLite database (dev)
+│ ├── database.py # Database connection setup
+│ ├── Dockerfile # Backend Docker configuration
+│ ├── main.py # FastAPI entry point
+│ ├── requirements.txt # Python dependencies
+│ ├── schema.sql # Database schema (optional if using migrations)
+│ ├── .env # Environment variables (local)
+│ ├── .env.sample # Example environment file
+│ └── README.md # Backend documentation
+│
+├── frontend/ # Next.js frontend
+│ ├── app/ # App router (Next.js 13+)
+│ ├── components/ # UI components
+│ ├── lib/ # Utility libraries
+│ ├── public/ # Static assets
+│ ├── .next/ # Next.js build output (ignored in git)
+│ ├── Dockerfile # Frontend Docker configuration
+│ ├── package.json # Node.js dependencies
+│ ├── package-lock.json # Lockfile
+│ ├── tsconfig.json # TypeScript configuration
+│ ├── next.config.ts # Next.js config
+│ ├── eslint.config.mjs # ESLint config
+│ ├── postcss.config.mjs # PostCSS config
+│ ├── tailwind.config.js # Tailwind CSS configuration
+│ ├── components.json # ShadCN components registry
+│ ├── .env # Frontend environment variables
+│ ├── .env.sample # Example environment file
+│ └── README.md # Frontend documentation
+│
+├── docker-compose.yml # Docker services configuration
+├── README.md # Main project documentation
+└── .gitignore # Git ignore file
 ```
+## 🔧 Configuration – API Keys
 
-## 🔧 Configuration
+AgriAgent requires several API keys for different features.  
+All keys should be added in the `.env` file located in the `backend/` directory.
 
-### API Keys Setup
+### 1. Database
+- **DATABASE_URL**  
+  Default: `sqlite+aiosqlite:///./agriagent.db`  
+  You can change this to PostgreSQL, MySQL, etc. if required.
 
-1. **OpenAI API Key** (Recommended)
-   - Sign up at https://platform.openai.com/
-   - Generate API key
-   - Add to `.env` file
+---
 
-2. **Weather API Key** (Required)
-   - Sign up at https://openweathermap.org/api
-   - Generate free API key
-   - Add to `.env` file
+### 2. Security
+- **SECRET_KEY** – Any random secure string for JWT tokens.  
+- **ALGORITHM** – Default: `HS256`  
+- **ACCESS_TOKEN_EXPIRE_MINUTES** – Token validity in minutes (default: `60`).
 
-### Database Configuration
+---
 
-The application uses PostgreSQL for structured data and Redis for caching. ChromaDB is used for vector storage (RAG functionality).
+### 3. Google Gemini / Generative AI
+- **GOOGLE_API_KEY**  
+  - Sign up at [Google AI Studio](https://ai.google.dev/)  
+  - Generate an API key  
+  - Add it here.  
 
-### Model Configuration
+- **GEMINI_API_KEY**  
+  - Alternative Gemini key (if using a different project setup).  
 
-The system downloads and caches AI models automatically:
-- **Whisper**: For speech-to-text conversion
-- **Sentence Transformers**: For text embeddings
-- **ResNet-50**: For image classification (as placeholder for disease detection)
+---
+
+### 4. Dhenu AI
+- **DHENU_API_KEY**  
+  - Required if using [Dhenu AI](https://dhenu.ai/) services.  
+
+---
+
+### 5. Weather API
+- **WEATHER_API_KEY**  
+  - Sign up at [OpenWeather](https://openweathermap.org/api)  
+  - Generate a free API key  
+  - Add it here.  
+
+---
+
+### 6. CORS
+- **FRONTEND_URL**  
+  - The URL of your frontend app.  
+  - Example: `http://localhost:3000`
+
+---
+
+### 7. Hugging Face
+- **HF_TOKEN**  
+  - Get token from [Hugging Face](https://huggingface.co/settings/tokens)  
+  - Required for model access.  
+
+- **HF_API_URL**  
+  - Default:  
+    ```
+    https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification
+    ```  
+  - Used for plant disease detection.
+
+---
+
+### 8. OpenAI
+- **OPENAI_API_KEY**  
+  - Sign up at [OpenAI](https://platform.openai.com/)  
+  - Generate API key  
+  - Add it here.  
+
+---
 
 ## 🌐 API Endpoints
 
 ### Authentication
-- `POST /auth/register` - Register new user
+- `POST /auth/signup` - Register new user
 - `POST /auth/login` - User login
 
 ### Core Features
-- `POST /chat` - Text chat queries
-- `POST /image-upload` - Image analysis
-- `POST /voice-search` - Voice query processing
-- `GET /health` - Health check
+- `POST /chat` - Text chat queries and also voice queries
+- `POST /upload` - Image analysis
+- `POST /forecast` - predict future rates of your crop
+
 
 ### API Documentation
 Visit http://localhost:8000/docs for interactive API documentation.
@@ -407,10 +482,13 @@ For support and questions:
 
 ## 🙏 Acknowledgments
 
-- OpenAI for GPT models and Whisper
-- Hugging Face for transformer models
-- The agricultural research community
-- Open source contributors
+- **[OpenAI](https://platform.openai.com/)** and **[Google Gemini](https://ai.google.dev/)** for providing powerful AI language models.  
+- **[Hugging Face](https://huggingface.co/)** for open-source transformer models and APIs.  
+- **Weather APIs** (for real-time weather and climate data integration).  
+- **[Dhenu](https://github.com/your-dhenu-link-or-source)** – cattle dataset & resources for livestock-related insights.  
+- The **agricultural research community** for datasets, insights, and continued innovation.  
+- **Open-source contributors** whose projects, tools, and libraries made this work possible.  
+
 
 ---
 
