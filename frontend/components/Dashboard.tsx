@@ -111,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ username, onLogout }) => {
           </p>
         </div>
         {/* Mode Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
           {modes.map((mode, index) => {
             const IconComponent = mode.icon
             return (
@@ -131,11 +131,13 @@ const Dashboard: React.FC<DashboardProps> = ({ username, onLogout }) => {
                   <CardDescription className="text-gray-600 mb-6 text-base leading-relaxed">
                     {mode.description}
                   </CardDescription>
-                  <Button
-                    className={`${mode.color} text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 group-hover:shadow-lg`}
-                  >
-                    Start Now for a Greener Tomorrow
-                  </Button>
+                  <div className="mt-4">
+                    <Button
+                      className={`w-full ${mode.color} text-white font-medium py-6 text-base rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg`}
+                    >
+                      Get Started
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )

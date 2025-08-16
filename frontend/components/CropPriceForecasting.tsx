@@ -217,7 +217,7 @@ const CropPriceForecasting: React.FC = () => {
             <TrendingUp className="text-green-600" />
             Agricultural Price Forecasting
           </h1>
-          <p className="text-gray-600">FastAPI-powered crop price prediction system</p>
+          <p className="text-gray-600">ML-powered crop price prediction system</p>
         </div>
 
         {/* Location Selection */}
