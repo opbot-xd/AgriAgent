@@ -3,13 +3,11 @@
 import React, { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Mic, CheckCircle, Play, RotateCcw, Volume2 } from "lucide-react"
-import axios from "axios"
+import { Mic } from "lucide-react"
 import { getApiUrl } from '@/lib/utils';
 
 interface VoiceInterfaceProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onResult: (result: any) => void
   setLoading: (loading: boolean) => void
   loading: boolean
@@ -17,8 +15,9 @@ interface VoiceInterfaceProps {
 
 const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, loading }) => {
   const [isRecording, setIsRecording] = useState(false)
-  const [recognizedText, setRecognizedText] = useState("")
+  // const [recognizedText, setRecognizedText] = useState("")
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
   const [audio, setAudio  ] = useState("")
   React.useEffect(() => {
@@ -32,6 +31,7 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
         },
         (error) => {
           setLocation({ lat: 0, lng: 0 })
+          console.log(error)
         }
       )
     } else {
@@ -41,7 +41,7 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
 
   const startRecording = async () => {
     try {
-      // @ts-ignore
+      // @ts-expect-error works in testing
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       if (!SpeechRecognition) {
         alert("Speech Recognition API not supported in this browser.")
@@ -51,20 +51,13 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
       recognition.lang = 'en'
       recognition.interimResults = false
       recognition.maxAlternatives = 1
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = async (event: any) => {
         const transcript = event.results[0][0].transcript
-        setRecognizedText(transcript)
+        // setRecognizedText(transcript)
         setIsRecording(false)
         setLoading(true)
         try {
-          // Detect language from backend
-          // const langRes = await fetch(getApiUrl('/api/detect-language'), {
-          //   method: 'POST',
-          //   headers: { 'Content-Type': 'application/json' },
-          //   body: JSON.stringify({ text: transcript })
-          // })
-          // const langData = await langRes.json()
-          // const detectedLanguage = langData.language || 'en'
           const res = await fetch(getApiUrl('/api/chat'), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -72,7 +65,6 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
               message: transcript,
               crop_name: "",
               location: location,
-              // language: detectedLanguage,
             }),
           })
           
@@ -93,12 +85,15 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
           }
           onResult(data)
           
-        } catch (error: any) {
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any 
+        catch (error: any) {
           onResult({ error: error.message || "Failed to process voice query" })
         } finally {
           setLoading(false)
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any 
       recognition.onerror = (event: any) => {
         setIsRecording(false)
         onResult({ error: event.error || "Speech recognition error" })
@@ -111,6 +106,7 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onResult, setLoading, l
       recognition.start()
     } catch (error) {
       alert("Failed to start speech recognition.")
+      console.error("Error:", error)
     }
   }
 

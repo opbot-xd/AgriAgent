@@ -6,8 +6,34 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, Bot, CheckCircle, CloudRain, Sun, Droplets, Wind, DollarSign, TrendingUp, BookOpen, Play } from "lucide-react"
 
+interface WeatherData {
+  temperature: number;
+  humidity: number;
+  description: string;
+  wind_speed: number;
+}
+
+interface MarketData {
+  crop: string;
+  price_per_quintal: number;
+  market: string;
+  trend: string;
+}
+
+interface Result {
+  error?: string;
+  audio_response?: string;
+  confidence?: number;
+  query?: string;
+  response?: string;
+  recommendations?: string[];
+  weather_data?: WeatherData;
+  market_data?: MarketData;
+  sources?: string[];
+}
+
 interface ResultDisplayProps {
-  result: any
+  result: Result;
 }
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {

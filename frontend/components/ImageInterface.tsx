@@ -10,11 +10,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Camera, Upload, RotateCcw, CheckCircle, MapPin, ThermometerSun } from "lucide-react"
+import { Camera, Upload, RotateCcw, CheckCircle } from "lucide-react"
 import ResultDisplay from "./ResultDisplay"
 import { getApiUrl } from '@/lib/utils';
 
 // Add props interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ImageInterfaceProps {}
 
 // Update component to accept props
@@ -23,6 +24,7 @@ const ImageInterface: React.FC<ImageInterfaceProps> = () => {
   const [language, setLanguage] = useState("en")
   const [preview, setPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null)
   const [location, setLocation] = useState<string>("")
   const [date, setDate] = useState<string>("")
@@ -73,10 +75,12 @@ const ImageInterface: React.FC<ImageInterfaceProps> = () => {
         headers: { "Content-Type": "multipart/form-data" },
       })
       setResult(response.data)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setResult({
         error: error.response?.data?.detail || "Failed to process image",
       })
+      console.log(error)
     } finally {
       setLoading(false)
     }
@@ -128,6 +132,7 @@ const ImageInterface: React.FC<ImageInterfaceProps> = () => {
               <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-green-400 transition-colors">
                 {preview ? (
                   <div className="space-y-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={preview}
                       alt="Preview"

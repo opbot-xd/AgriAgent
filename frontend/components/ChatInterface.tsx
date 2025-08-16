@@ -27,17 +27,16 @@ interface Location {
 }
 
 interface ChatInterfaceProps {
-  onResult: (result: any) => void;
   setLoading: (loading: boolean) => void;
   loading: boolean;
 }
 
-export default function ChatInterface({ onResult, setLoading, loading }: ChatInterfaceProps) {
+export default function ChatInterface({ setLoading, loading }: ChatInterfaceProps) {
   const [message, setMessage] = useState('');
   const [crop, setCrop] = useState('');
   const [location, setLocation] = useState<Location | null>(null);
   const [response, setResponse] = useState<ResultDisplayProps>({});
-  const [responseLang, setResponseLang] = useState('en');
+  // const [responseLang, setResponseLang] = useState('en');
   const [userMessage, setUserMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const [audioPlayer, setAudioPlayer] = useState(null);
@@ -92,7 +91,7 @@ export default function ChatInterface({ onResult, setLoading, loading }: ChatInt
     setCrop('');
     setLoading(true);
     setResponse({});
-    setResponseLang('en');
+    // setResponseLang('en');
     try {
       const res = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
@@ -108,11 +107,11 @@ export default function ChatInterface({ onResult, setLoading, loading }: ChatInt
       const data = await res.json();
       setResponse(data);
       console.log(data);
-      setResponseLang(data.lang || navigator.language.split('-')[0] || 'en');
+      // setResponseLang(data.lang || navigator.language.split('-')[0] || 'en');
     } catch (error) {
       console.error('Error:', error);
       setResponse({});
-      setResponseLang('en');
+      // setResponseLang('en');
     } finally {
       setLoading(false);
     }
@@ -121,7 +120,7 @@ export default function ChatInterface({ onResult, setLoading, loading }: ChatInt
   const handleReset = () => {
     setUserMessage('');
     setResponse({});
-    setResponseLang('en');
+    // setResponseLang('en');
     setMessage('');
     setCrop('');
   };
@@ -148,7 +147,7 @@ export default function ChatInterface({ onResult, setLoading, loading }: ChatInt
       <div className="flex-1 overflow-y-auto mb-4 space-y-4">
         {!userMessage && !response?.response ? (
           <div className="text-center text-gray-500 mt-10">
-            Ask me anything about your {crop || 'crop'} and I'll help you!
+            Ask me anything about your {crop || 'crop'} and I will help you!
           </div>
         ) : (
           <>

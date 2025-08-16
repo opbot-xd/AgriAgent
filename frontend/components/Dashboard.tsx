@@ -18,6 +18,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ username, onLogout }) => {
   const [activeMode, setActiveMode] = useState<string | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
@@ -68,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({ username, onLogout }) => {
           }}
         />
         <div className="container mx-auto px-4 py-8">
-          {activeMode === "chat" && <ChatInterface onResult={setResult} setLoading={setLoading} loading={loading} />}
+          {activeMode === "chat" && <ChatInterface setLoading={setLoading} loading={loading} />}
           {activeMode === "image" && <ImageInterface />}
           {activeMode === "voice" && <VoiceInterface onResult={setResult} setLoading={setLoading} loading={loading} />}
           {activeMode === "forecast" && <CropPriceForecasting />}

@@ -34,8 +34,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       localStorage.setItem("token", response.data.access_token)
       localStorage.setItem("username", formData.username)
       onLogin(formData.username)
-    } catch (err: any) {
-      setError(err.response?.data?.detail || "Authentication failed")
+    } catch (err: unknown) {
+      const e = err as Error
+      setError(e.message || "Authentication failed")
     } finally {
       setLoading(false)
     }

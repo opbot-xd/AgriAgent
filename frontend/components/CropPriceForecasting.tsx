@@ -19,7 +19,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+import { getApiUrl } from '@/lib/utils';
 
 // ==== Types ====
 interface LocationData {
@@ -94,7 +94,13 @@ const CropPriceForecasting: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedCrop, setSelectedCrop] = useState('');
   const [forecastDays, setForecastDays] = useState<number>(30);
+  type PriceType = 'min_price' | 'modal_price' | 'max_price';
   const [priceType, setPriceType] = useState<'Modal_price' | 'Min_price' | 'Max_price'>('Modal_price');
+
+  // Helper function to get the correct price type key
+  const getPriceKey = (type: string): PriceType => {
+    return `${type.toLowerCase().split('_')[0]}_price` as PriceType;
+  };
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
   const [forecastResult, setForecastResult] = useState<ForecastResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -105,7 +111,7 @@ const CropPriceForecasting: React.FC = () => {
   useEffect(() => {
     const loadLocations = async () => {
       try {
-        const locationsResponse = await fetch(`${API_BASE_URL}/forecast/locations`);
+        const locationsResponse = await fetch(getApiUrl('forecast/locations'));
         if (locationsResponse.ok) {
           const data: LocationData = await locationsResponse.json();
           setLocations(data);
@@ -127,7 +133,7 @@ const CropPriceForecasting: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/forecast`, {
+      const response = await fetch(getApiUrl('forecast'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +142,7 @@ const CropPriceForecasting: React.FC = () => {
           state: selectedState,
           district: selectedDistrict,
           crop: selectedCrop,
-          price_type: priceType,
+          price_type: priceType.toLowerCase(),
           forecast_days: forecastDays,
         }),
       });
@@ -148,8 +154,9 @@ const CropPriceForecasting: React.FC = () => {
         const errorData = await response.json();
         setError(errorData.detail || 'Failed to generate forecast');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('Network error: Unable to connect to API');
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -182,15 +189,18 @@ const CropPriceForecasting: React.FC = () => {
 
   const downloadForecast = () => {
     if (!forecastResult) return;
-    const csvData = forecastResult.forecast_data.map((item) => ({
-      Date: item.date,
-      [`Predicted_${priceType}`]: item[priceType.toLowerCase() as keyof ForecastDataPoint].toFixed(2),
-      Confidence_Upper: item.confidence_upper?.toFixed(2) || '',
-      Confidence_Lower: item.confidence_lower?.toFixed(2) || '',
-      State: selectedState,
-      District: selectedDistrict,
-      Crop: selectedCrop,
-    }));
+    const csvData = forecastResult.forecast_data.map((item) => {
+      const value = item[getPriceKey(priceType)];
+      return {
+        Date: item.date,
+        [`Predicted_${priceType}`]: value.toFixed(2),
+        Confidence_Upper: item.confidence_upper?.toFixed(2) || '',
+        Confidence_Lower: item.confidence_lower?.toFixed(2) || '',
+        State: selectedState,
+        District: selectedDistrict,
+        Crop: selectedCrop,
+      };
+    });
 
     const csvContent = [
       Object.keys(csvData[0]).join(','),
@@ -302,7 +312,7 @@ const CropPriceForecasting: React.FC = () => {
                   <label className="block text-sm font-medium mb-2">Price Type</label>
                   <select
                     value={priceType}
-                    onChange={(e) => setPriceType(e.target.value)}
+                    onChange={(e) => setPriceType(e.target.value as 'Modal_price' | 'Min_price' | 'Max_price')}
                     className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="Modal_price">Modal Price</option>
@@ -412,7 +422,7 @@ const CropPriceForecasting: React.FC = () => {
                   <p className="text-xl font-bold text-purple-600">{(100 - forecastResult.metrics.mape).toFixed(1)}%</p>
                 </div>
               </div>
-              
+
               {/* Additional metrics row */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
                 <div className="text-center">
@@ -422,7 +432,7 @@ const CropPriceForecasting: React.FC = () => {
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Latest Price</p>
                   <p className="text-lg font-bold text-green-600">
-                    ₹{historicalData[historicalData.length - 1]?.[priceType.toLowerCase()]?.toFixed(2) || 'N/A'}
+                    ₹{historicalData[historicalData.length - 1]?.[getPriceKey(priceType)]?.toFixed(2) || 'N/A'}
                   </p>
                 </div>
                 <div className="text-center">
@@ -446,18 +456,18 @@ const CropPriceForecasting: React.FC = () => {
                     <div>
                       <p className="text-sm text-blue-600">Current Price</p>
                       <p className="text-2xl font-bold text-blue-800">
-                        ₹{historicalData[historicalData.length - 1]?.[priceType.toLowerCase()]?.toFixed(2)}
+                        ₹{historicalData[historicalData.length - 1]?.[getPriceKey(priceType)]?.toFixed(2)}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-blue-600">Predicted Price ({forecastDays} days)</p>
                       <p className="text-2xl font-bold text-blue-800">
-                        ₹{forecastResult.forecast_data[forecastResult.forecast_data.length - 1]?.[priceType.toLowerCase()]?.toFixed(2)}
+                        ₹{forecastResult.forecast_data[forecastResult.forecast_data.length - 1]?.[getPriceKey(priceType)]?.toFixed(2)}
                       </p>
                     </div>
                     {(() => {
-                      const currentPrice = historicalData[historicalData.length - 1]?.[priceType.toLowerCase()];
-                      const futurePrice = forecastResult.forecast_data[forecastResult.forecast_data.length - 1]?.[priceType.toLowerCase()];
+                      const currentPrice = historicalData[historicalData.length - 1]?.[getPriceKey(priceType)];
+                      const futurePrice = forecastResult.forecast_data[forecastResult.forecast_data.length - 1]?.[getPriceKey(priceType)];
                       const change = ((futurePrice - currentPrice) / currentPrice * 100);
                       return (
                         <div className={`p-2 rounded ${change >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
@@ -481,19 +491,19 @@ const CropPriceForecasting: React.FC = () => {
                     <div>
                       <p className="text-sm text-green-600">Minimum Expected</p>
                       <p className="text-xl font-bold text-green-800">
-                        ₹{Math.min(...forecastResult.forecast_data.map(d => d[priceType.toLowerCase()])).toFixed(2)}
+                        ₹{Math.min(...forecastResult.forecast_data.map(d => d[getPriceKey(priceType)])).toFixed(2)}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-green-600">Maximum Expected</p>
                       <p className="text-xl font-bold text-green-800">
-                        ₹{Math.max(...forecastResult.forecast_data.map(d => d[priceType.toLowerCase()])).toFixed(2)}
+                        ₹{Math.max(...forecastResult.forecast_data.map(d => d[getPriceKey(priceType)])).toFixed(2)}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-green-600">Average Forecast</p>
                       <p className="text-xl font-bold text-green-800">
-                        ₹{(forecastResult.forecast_data.reduce((sum, d) => sum + d[priceType.toLowerCase()], 0) / forecastResult.forecast_data.length).toFixed(2)}
+                        ₹{(forecastResult.forecast_data.reduce((sum, d) => sum + d[getPriceKey(priceType)], 0) / forecastResult.forecast_data.length).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -546,53 +556,57 @@ const CropPriceForecasting: React.FC = () => {
                 Price Trends & Forecast: {selectedCrop} in {selectedDistrict}, {selectedState}
               </CardTitle>
               <p className="text-sm text-gray-500 mt-2">
-                Historical data ({historicalData.length} points) and {forecastResult.forecast_data.length}-day forecast with confidence intervals
+                Historical data ({historicalData.length} points){forecastResult ? ` and ${forecastResult.forecast_data.length}-day forecast with confidence intervals` : ''}
               </p>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={500}>
                 <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{fontSize: 12}}
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
                     tickFormatter={(date) => {
                       const d = new Date(date);
                       return `${d.getMonth() + 1}/${d.getDate()}`;
                     }}
                   />
-                  <YAxis 
-                    tick={{fontSize: 12}}
+                  <YAxis
+                    tick={{ fontSize: 12 }}
                     label={{ value: 'Price (₹/Quintal)', angle: -90, position: 'insideLeft' }}
                     domain={['dataMin - 100', 'dataMax + 100']}
                   />
-                  <Tooltip 
+                  <Tooltip
                     labelFormatter={(date) => `Date: ${new Date(date).toLocaleDateString()}`}
                     formatter={(value, name, props) => {
                       const isHistorical = props.payload.type === 'historical';
                       const prefix = isHistorical ? 'Historical' : 'Forecast';
-                      return [`₹${value?.toFixed(2)}`, `${prefix} ${name}`];
+                      const formattedValue = typeof value === 'number' ? `₹${value.toFixed(2)}` : value;
+                      return [formattedValue, `${prefix} ${name}`];
                     }}
                     contentStyle={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}
                   />
                   <Legend />
-                  
+
                   {/* Main price line */}
                   <Line
                     type="monotone"
-                    dataKey={priceType.toLowerCase()}
+                    dataKey={getPriceKey(priceType)}
                     stroke="#2563eb"
                     strokeWidth={3}
                     dot={(props) => {
-                      const { payload } = props;
-                      return payload.type === 'forecast' ? 
-                        <circle {...props} fill="#dc2626" stroke="#dc2626" strokeWidth={2} r={4} /> :
-                        <circle {...props} fill="#2563eb" stroke="#2563eb" strokeWidth={2} r={3} />;
+                      const { cx, cy, payload } = props; // only take what you need
+                      return payload.type === "forecast" ? (
+                        <circle cx={cx} cy={cy} r={4} fill="#dc2626" stroke="#dc2626" strokeWidth={2} />
+                      ) : (
+                        <circle cx={cx} cy={cy} r={3} fill="#2563eb" stroke="#2563eb" strokeWidth={2} />
+                      );
                     }}
-                    name={`${priceType.replace('_', ' ')}`}
+                    name={`${priceType.replace("_", " ")}`}
                     connectNulls={false}
                   />
-                  
+
+
                   {/* Confidence bands */}
                   <Line
                     type="monotone"
@@ -614,7 +628,7 @@ const CropPriceForecasting: React.FC = () => {
                   />
                 </LineChart>
               </ResponsiveContainer>
-              
+
               {/* Chart Legend */}
               <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
