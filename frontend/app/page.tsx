@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react"
 import Dashboard from "@/components/Dashboard"
 import Login from "@/components/Login"
-import AuthForm from "@/components/AuthForm"
 
 export default function AgricultureApp() {
   const [user, setUser] = useState<string | null>(null)

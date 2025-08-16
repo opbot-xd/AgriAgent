@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Send, CheckCircle, User, Bot, CloudRain, Sun, Droplets, Wind } from 'lucide-react';
-import { speakText } from '@/lib/tts';
 import { getApiUrl } from '@/lib/utils';
 
 interface ResultDisplayProps {
@@ -41,7 +40,7 @@ export default function ChatInterface({ onResult, setLoading, loading }: ChatInt
   const [responseLang, setResponseLang] = useState('en');
   const [userMessage, setUserMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [audioPlayer, setAudioPlayer] = useState(null);
+  // const [audioPlayer, setAudioPlayer] = useState(null);
 
   const playAudio = () => {
     if (!response?.audio_response) return;
