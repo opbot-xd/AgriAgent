@@ -313,74 +313,6 @@ Visit http://localhost:8000/docs for interactive API documentation.
 - Input validation and sanitization
 - Rate limiting (Redis-based)
 
-## 🚀 Deployment
-
-### Production Deployment with Docker
-
-1. **Update Environment Variables**
-
-```env
-# Use strong secrets in production
-SECRET_KEY=your-very-strong-secret-key-here
-DATABASE_URL=postgresql://user:pass@prod-db:5432/agriagent
-
-# Enable HTTPS
-HTTPS_ENABLED=true
-SSL_CERT_PATH=/path/to/ssl/cert.pem
-SSL_KEY_PATH=/path/to/ssl/key.pem
-```
-
-2. **Build Production Images**
-
-```bash
-docker-compose -f docker-compose.prod.yml up --build -d
-```
-
-### Cloud Deployment Options
-
-#### AWS Deployment
-- Use ECS/EKS for container orchestration
-- RDS for PostgreSQL
-- ElastiCache for Redis
-- S3 for file storage
-
-#### Google Cloud Platform
-- Cloud Run for serverless deployment
-- Cloud SQL for PostgreSQL
-- Memorystore for Redis
-- Cloud Storage for files
-
-#### Azure Deployment
-- Azure Container Instances
-- Azure Database for PostgreSQL
-- Azure Cache for Redis
-- Azure Blob Storage
-
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend
-pytest
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
-```
-
-### End-to-End Testing
-
-```bash
-# Install testing dependencies
-pip install selenium pytest-selenium
-
-# Run E2E tests
-pytest tests/e2e/
-```
 
 ## 🐛 Troubleshooting
 
@@ -404,42 +336,6 @@ pytest tests/e2e/
    - Install ffmpeg: `sudo apt-get install ffmpeg`
    - Check microphone permissions in browser
 
-### Performance Optimization
-
-1. **Database Optimization**
-   - Create appropriate indexes
-   - Regular VACUUM and ANALYZE
-   - Connection pooling
-
-2. **Caching Strategy**
-   - Redis for API responses
-   - CDN for static assets
-   - Browser caching headers
-
-3. **Model Optimization**
-   - Use quantized models for faster inference
-   - Implement model caching
-   - Consider GPU acceleration for production
-
-## 📊 Monitoring and Logging
-
-### Application Monitoring
-
-```bash
-# View logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# Monitor resource usage
-docker stats
-```
-
-### Health Checks
-
-The application includes health check endpoints:
-- Backend: http://localhost:8000/health
-- Database connectivity check
-- Redis connectivity check
 
 ## 🤝 Contributing
 
@@ -463,32 +359,33 @@ For support and questions:
 ## 🎯 Roadmap
 
 ### Phase 1 (Current)
-- ✅ Basic chat functionality
-- ✅ Image upload and analysis
-- ✅ Voice query processing
-- ✅ Multi-language support
+- ✅ Multilingual chat support (Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Punjabi, English)  
+- ✅ Crop image upload and disease detection (Hugging Face model)  
+- ✅ Voice query support with text-to-speech responses  
+- ✅ Weather integration and market insights  
+- ✅ AI-powered price prediction  
 
 ### Phase 2 (Planned)
-- [ ] Advanced disease detection models
-- [ ] SMS/WhatsApp integration
-- [ ] Mobile application
-- [ ] Offline mode improvements
+- [ ] SMS/WhatsApp/IVR integration for wider accessibility  
+- [ ] Farmer community features for peer-to-peer learning and sharing  
+- [ ] Mobile application (Flutter) for better farmer experience  
+- [ ] Improved ML models for accurate disease diagnosis and recommendations  
 
 ### Phase 3 (Future)
-- [ ] IoT sensor integration
-- [ ] Advanced analytics dashboard
-- [ ] Farmer community features
-- [ ] Government scheme integration
+- [ ] Offline/low-connectivity mode for remote villages  
+- [ ] Partnerships with NGOs, AgriTech companies, and government bodies  
+- [ ] Advanced analytics dashboard for farmers  
+- [ ] Continuous AI learning from farmer queries and images  
+
 
 ## 🙏 Acknowledgments
 
 - **[OpenAI](https://platform.openai.com/)** and **[Google Gemini](https://ai.google.dev/)** for providing powerful AI language models.  
 - **[Hugging Face](https://huggingface.co/)** for open-source transformer models and APIs.  
 - **Weather APIs** (for real-time weather and climate data integration).  
-- **[Dhenu](https://github.com/your-dhenu-link-or-source)** – cattle dataset & resources for livestock-related insights.  
+- **[Dhenu](https://dhenu.ai/chat)** – for agri advices  
 - The **agricultural research community** for datasets, insights, and continued innovation.  
 - **Open-source contributors** whose projects, tools, and libraries made this work possible.  
-
 
 ---
 
